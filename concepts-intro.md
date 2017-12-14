@@ -149,9 +149,11 @@ requires (T a, T b) {
 
 ## 如何使用concepts
 
-使用concepts时也需要使用requires语句。
+
+### concepts限制模板参数
+
+当使用concepts来作为模板参数的限制时也需要使用requires语句。
 这里requires语句用来指定模板参数的限制，而不是定义这些限制。
-如：
 
 ```cpp
 template <typename T>
@@ -164,8 +166,6 @@ bool f(T t);
 上面的例子还有两种缩写形式:
 
 ```cpp
-bool f(Eq);
-
 template <Eq T>
 bool f(T t);
 
@@ -173,9 +173,25 @@ Eq{T} bool f(T t);
 
 template<typename T>
 bool f(T t) requires Eq<T>;
+
+bool f(Eq);
 ```
 
 由此可见各种使用方式都是等价的，但是这些限制在检查时有优先级关系，详细可以参考[技术说明](http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2015/n4549.pdf)
+
+### 作为占位符使用
+
+当concepts作为占位符使用时能支持同`C++11`中引进的占位符`auto`一样的推导能力，
+并且能在此基础上增加concepts本身定义的限制。如:
+
+```cpp
+Sortable x = f(y)
+// x的类型从f的返回值中推断出来，只有f的返回值满足Sortable限制时才能通过编译
+
+auto f(Container) -> Sortable;
+// 声明一个函数f，它接受满足Container限制类型的参数，返回类型满足Sortable限制
+```
+
 
 目前GCC 6.0以上的版本可以通过`-fconcepts`选项来使用测试中的concepts特性。
 
