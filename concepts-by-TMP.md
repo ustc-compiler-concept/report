@@ -16,34 +16,34 @@
 再给出concepts到模板元编程的翻译方案（并不语法制导）来说明concepts能用元编程实现。
 
 
-## 实例-EqualityComparable
+## 实例-Arithmatic
 
-EqualityComparable定义了两个类型可比较相等的限制，
-即它们之间有`==`和`!=`的操作符重载
+Arithmatic定义了四则运算限制，即所限制的类型必须有`+`、`-`、`*`、`/`四个操作符
 
-### EqualityComparable in concepts
+### 使用concepts定义Arithmatic
 
 ```cpp
 template <typename T>
-concept bool EqualityComparable = 
+concept bool Arithmatic = 
         requires (T t) {            // 参数化限制
-            {t == t} -> bool,       // 表达式限制， 隐式转化限制
-            {t != t} -> bool
-        }
-
-template <typename T, typename U = T>
-concept bool EqualityComparable =
-        EqualityComparable<T> &&    // 合取限制
-        EqualityComparable<U> &&
-        requires (T t, U u) {
-            {t == u} -> bool,
-            {u == t} -> bool,
-            {t != u} -> bool
-            {u != t} -> bool
+            {t + t} -> T,       // 表达式限制， 隐式转化限制
+            {t - t} -> T,
+            {t * t} -> T,
+            {t / t} -> T
         }
 ```
 
-### EqualityComparable in template metaprogramming
+它可以这样来使用：
+
+```cpp
+Arithmatic{T}
+void f(T t)
+{
+    std::cout << typeid(T).name() << " is Arithmatic." << std::endl;
+}
+```
+
+### 使用模板元变成定义Arithmatic
 
 ```cpp
 // void_t只接收构造参数，并不产生任何类型
@@ -87,9 +87,14 @@ struct _Arithmatic<T, void_t<
         >::type
 >> : std::true_type { };
 
+// 封装以方便使用
 template <typename T>
 using Arithmatic = typename std::enable_if<_Arithmatic<T>::value>::type;
+```
 
+我们通过关联类型来使用它：
+
+```cpp
 template <typename T, typename Arithmatic<T>>
 void f(T p)
 {
@@ -97,11 +102,52 @@ void f(T p)
 }
 ```
 
-To understand these code, you should have a basic idea of SFINAE (a method that makes template powerful), and template matching rules
-in the template parameters, decltype is used to check existence of operator== and operator!=, and for different types, it has to check their self comparability before mutual comparability
+只要有着基本的模板知识，这些代码并不难理解。
 
-a concept version:
-```cpp
+## 将限制翻译到模板
 
-```
+在本节，将会一一介绍每种类型的限制能否翻译到模板和它们的翻译方案。
 
+### 合取限制
+
+封装类型`P`和`Q`的合取可以直接将它们加入到`void_t`的参数列表中，未封装的类`_P`和`_Q`的合取可以表示为将`std::enable_if<_P::value && _Q::value>::type`加入到`void_t`的参数列表中
+
+### 析取限制
+
+封装后的类型并不能表示析取，但是未封装的类`_P`和`_Q`的析取可以表示为将`std::enable_if<_P::value || _Q::value>::type`加入到`void_t`的参数列表中
+
+### 断言限制
+
+任一断言`P`，可以通过将`std::enable_if<P>::type`加入到`void_t`的参数列表中来增加断言限制
+
+### 表达式限制
+
+任一表达式`E`，可以通过将`decltype(E)`加入到`void_t`的参数中来增加表达式限制
+
+### 类型限制
+
+任一类型`T`，可以通过将`T`加入到`void_t`的参数列表中来增加类型限制
+
+### 隐式转换限制
+
+任一隐式转换限制`{ E } -> T`可以同过将`decltype(static_cast<T>(E))`加入到`void_t`的参数列表中来增加类型限制
+
+### 参数推导限制
+
+由于`auto`当前的推导功能有限，所以无法支持参数推导限制
+
+### 异常限制
+
+任一异常限制`noexcept(E)`可以通过将`std::enable_if<noexcept(E)>::type`加入参数列表中来增加异常限制
+
+### 参数化限制
+
+参数化限制只是一个用来增加可读性的语法，在模板元编程中我们直接对类型计算，所以并不需要这个
+
+## 总结
+
+我们可以通过上述方法来模拟出concepts的大部分功能，这说明concepts并没有很大程度的扩展了C++语言的表达能力
+
+## 参考文献
+
+1. [boost hana](https://github.com/boostorg/hana/tree/master/include/boost/hana/concept)
