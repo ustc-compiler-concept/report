@@ -7,14 +7,14 @@ concepts是C++中的一个语言扩展。
 在这些这些限制上可以进行函数重载和模板特化。
 为此，它引入了两个新的关键字，分别是`concept`和`requires`
 
-## concepts的形式
+## concepts的类型
 
-在技术说明中，concepts的被定义为以下的形式：
+在[技术说明](http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2015/n4549.pdf)中，concepts的被定义为以下的形式：
 
     template <template-parameter-list>
     concept concept-name = constraint-expression;
 
-它可以分为*函数concepts*和*变量concepts*, 二者都必须以`bool`作为（返回）类型。从它的形式可以看出，对于concepts的实际定义都在等号后的`constraint-expression`（即限制表达式）中。而限制是指一系列能够定义对模板参数要求的逻辑操作，它们总共有9种形式：
+它可以分为[函数concept](#变量concept)和[变量concept](#变量concept), 二者都必须以`bool`作为（返回）类型。从它的形式可以看出，对于concepts的实际定义都在等号后。而限制是指一系列能够定义对模板参数要求的逻辑操作，它们总共有9种类型：
 
 1. 合取限制
 2. 析取限制
@@ -115,7 +115,77 @@ requires (T a, T b) {
 
 ## 如何定义concepts
 
+使用`concept`关键字和`requires`语句可以定义concepts。
+它们只能在命名空间作用域被定义（而不能在类作用域，函数作用域等等）
+
+### 变量concept
+
+有`concept`限定符的模板变量定义了变量concept
+它有以下三点限制：
+
+1. 声明的类型必须是`bool`
+2. 声明中必须包含初始定义
+3. 初始定义应是[表达式限制](#concepts的类型)
+
+### 函数concept
+
+有`concept`限定符的模板函数定义了函数concept
+它有以下四点限制:
+
+1. 所有函数限定符不能出现在它的声明中
+2. 返回类型必须是`bool`
+3. 声明的参数列表必须为空
+4. 声明应该有一个这样子的函数体：`{ return E; }`，其中`E`是表达式限制
+
+### requires语句
+
+定义时，我们使用requires语句来定义[之前](#concepts的类型)提到的限制类型，
+它会跟着参数列表，所以本身就能定义参数化限制。
+
+* 简单requires语句能够定义一个表达式限制
+* 类型requires语句能够定义一个类型限制
+* 混合requires能够定义表达式限制、类型限制、异常限制、参数推导限制和隐藏式转换限制
+* 嵌套requires语句可以定义局部参数的一些附加限制
 
 ## 如何使用concepts
+
+使用concepts时也需要使用requires语句。
+这里requires语句用来指定模板参数的限制，而不是定义这些限制。
+如：
+
+```cpp
+template <typename T>
+requires Eq<T>
+bool f(T t);
+```
+
+它定义了一个模板函数`f`，模板参数类型`T`必须满足`Eq`这个concept所定义的限制才能被实例化成功
+
+上面的例子还有两种缩写形式:
+
+```cpp
+bool f(Eq);
+
+template <Eq T>
+bool f(T t);
+
+Eq{T} bool f(T t);
+
+template<typename T>
+bool f(T t) requires Eq<T>;
+```
+
+由此可见各种使用方式都是等价的，但是这些限制在检查时有优先级关系，详细可以参考[技术说明](http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2015/n4549.pdf)
+
+目前GCC 6.0以上的版本可以通过`-fconcepts`选项来使用测试中的concepts特性。
+
+## 总结
+
+本文对concepts的语法和语义进行了初步的介绍。通过本文应该能理解什么是concepts，我们能用它做什么，如果想要了解更多关于cocepts的资料应该去阅读文末的参考文献。
+
+## 参考文献
+
+1. [a bit of background for concepts and C++17 - BJarn Stroustrup](https://isocpp.org/blog/2016/02/a-bit-of-background-for-concepts-and-cpp17-bjarne-stroustrup)
+2. [Concepts TS](http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2015/n4549.pdf)
 
 
