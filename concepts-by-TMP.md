@@ -55,7 +55,6 @@ template <typename T, typename = void>
 struct _Arithmatic : std::false_type { };
 
 
-// 三元运算符对第一个操作数有
 template <typename T>
 struct _Arithmatic<T, void_t<
     decltype(static_cast<T>(static_cast<T>(*(T*)0) + static_cast<T>(*(T*)0))),
