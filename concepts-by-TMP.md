@@ -50,10 +50,6 @@ void f(T t)
 template <typename ...>
 using void_t = void;
 
-// 类似std::common_type
-template <typename T, typename U>
-struct common_type {  };
-
 // 匹配失败
 template <typename T, typename = void>
 struct _Arithmatic : std::false_type { };
@@ -62,29 +58,10 @@ struct _Arithmatic : std::false_type { };
 // 三元运算符对第一个操作数有
 template <typename T>
 struct _Arithmatic<T, void_t<
-    typename std::enable_if<
-        std::is_same<
-            decltype(static_cast<T&&>(*(T*)0) + static_cast<T&&>(*(T*)0)),
-            T
-            >::value
-        >::type,
-    typename std::enable_if<
-        std::is_same<
-            decltype(static_cast<T&&>(*(T*)0) - static_cast<T&&>(*(T*)0)),
-            T
-            >::value
-        >::type,
-    typename std::enable_if<
-        std::is_same<
-            decltype(static_cast<T&&>(*(T*)0) * static_cast<T&&>(*(T*)0)),
-            T
-            >::value
-        >::type,
-    typename std::enable_if<
-        std::is_same<
-            decltype(static_cast<T&&>(*(T*)0) / static_cast<T&&>(*(T*)0)),
-            T>::value
-        >::type
+    decltype(static_cast<T>(static_cast<T>(*(T*)0) + static_cast<T>(*(T*)0))),
+    decltype(static_cast<T>(static_cast<T>(*(T*)0) - static_cast<T>(*(T*)0))),
+    decltype(static_cast<T>(static_cast<T>(*(T*)0) * static_cast<T>(*(T*)0))),
+    decltype(static_cast<T>(static_cast<T>(*(T*)0) / static_cast<T>(*(T*)0)))
 >> : std::true_type { };
 
 // 封装以方便使用
@@ -95,7 +72,7 @@ using Arithmatic = typename std::enable_if<_Arithmatic<T>::value>::type;
 我们通过关联类型来使用它：
 
 ```cpp
-template <typename T, typename Arithmatic<T>>
+template <typename T, typename = Arithmatic<T>>
 void f(T p)
 {
     std::cout << typeid(T).name() <<  " is Arithmatic" << std::endl;
@@ -138,11 +115,11 @@ void f(T p)
 
 ### 异常限制
 
-任一异常限制`noexcept(E)`可以通过将`std::enable_if<noexcept(E)>::type`加入参数列表中来增加异常限制
+任一异常限制`noexcept(E)`可以通过将`std::enable_if<noexcept(E)>::type`加入到`void_t`的参数列表中来增加异常限制
 
 ### 参数化限制
 
-参数化限制只是一个用来增加可读性的语法，在模板元编程中我们直接对类型计算，所以并不需要这个
+参数`T t`可以使用`static_cast<T>(*(T*)0)`来进行表示，缺点是不能有名字，不过能起到等价的效果
 
 ## 总结
 
