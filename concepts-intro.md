@@ -1,10 +1,30 @@
 # concepts
 
+## C++中的泛型编程
+
+泛型编程是一个重要的编程手法。通常我们希望写出一个通用的算法，使得
+它能够应用在许多类型上，而不是为每一个类型写一个函数。于是C++的作者
+Bjarn Stroustrup设计了模板，它一开始对模板的期望是:
+
+1.  高通用性/良好的表达能力
+2.  比起手写的代码并不会增加额外开销
+3.  良好定义的接口
+
+但是没有人知道如何同时做到这三点，于是模板变成了:
+
+1.  图灵完全
+2.  比手写编程效率更高
+3.  肮脏的接口
+
+尽管有着前两个特点使得模板大获成功，并且还诞生了模板元编程这种东西，
+但是糟糕的接口设计使得我们在编译错误时会看到一堆无用的报错信息。
+因此Stroustrup一直希望能够设计出更好的接口，具体来说是对模板参数进行限制
+于是就诞生了concepts
+
 ## 什么是concepts?
 
-concepts是C++中的一个语言扩展。
-它能够定义和检查对于模板参数的限制，
-在这些这些限制上可以进行函数重载和模板特化。
+concepts是C++中的一个语言扩展。 它能够定义和检查对于模板参数的限制， 在这些这些限制上可以进行函数重载和模板特化。
+concepts的目标是使用简单的方法就可以定义和使用，而不是像模板一样可以用各种魔法。
 为此，它引入了两个新的关键字，分别是`concept`和`requires`
 
 ## concepts的类型
@@ -192,6 +212,8 @@ auto f(Container) -> Sortable;
 // 声明一个函数f，它接受满足Container限制类型的参数，返回类型满足Sortable限制
 ```
 
+而`auto`则可以理解成没有任何限制的concepts，这样占位符就有了统一的定义
+
 
 目前GCC 6.0以上的版本可以通过`-fconcepts`选项来使用测试中的concepts特性。
 
@@ -201,7 +223,8 @@ auto f(Container) -> Sortable;
 
 ## 参考文献
 
-1. [a bit of background for concepts and C++17 - BJarn Stroustrup](https://isocpp.org/blog/2016/02/a-bit-of-background-for-concepts-and-cpp17-bjarne-stroustrup)
+1. [a bit of background for concepts and C++17 - Bjarn Stroustrup](https://isocpp.org/blog/2016/02/a-bit-of-background-for-concepts-and-cpp17-bjarne-stroustrup)
 2. [Concepts TS](http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2015/n4549.pdf)
+3. [Concepts: The Future of Generic Programming](http://www.stroustrup.com/good_concepts.pdf)
 
 
