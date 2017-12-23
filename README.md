@@ -7,4 +7,5 @@
 
 - [concepts简介](https://github.com/ustc-compiler-concepts/report/blob/master/concepts-intro.md)
 - [基于模板元编程的concepts实现](https://github.com/ustc-compiler-concepts/report/blob/master/concepts-by-TMP.md)
+- [Haskell中的type class](https://github.com/ustc-compiler-concepts/report/blob/master/type-class-in-haskell.md)
 - [concepts作为编程范式](https://github.com/ustc-compiler-concepts/report/blob/master/concepts-in-generic-programming.md)

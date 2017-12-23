@@ -129,7 +129,7 @@ Val sum(Iter first, Iter last, Val acc)
 concepts的约束具体是什么显然是糟糕的，在用了`Number`之后，
 用户马上会从`Number`这个概念(Concept)联想到了它应该支持的具体操作。
 针对抽象数据类型而不是具体实现进行程序设计非常适合人类的思维模式，
-所以用户反而 更加不容易出错。在[Haskell](https://www.haskell.org/)
+所以用户反而 更加不容易出错。在[Haskell](https://github.com/ustc-compiler-concepts/report/blob/master/type-class-in-haskell.md)
 中也存在[typeclass](http://learnyouahaskell.com/types-and-typeclasses)这个概念，
 它与concepts 有所不同，但相似的是它们都会约束类型的行为。
 所以在使用concepts时 可以借鉴已经存在的typeclass在设计时的一些方式。
