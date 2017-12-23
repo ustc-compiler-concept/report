@@ -16,15 +16,15 @@
 再给出concepts到模板元编程的翻译方案（并不语法制导）来说明concepts能用元编程实现。
 
 
-## 实例-Arithmatic
+## 实例-Arithmetic
 
-Arithmatic定义了四则运算限制，即所限制的类型必须有`+`、`-`、`*`、`/`四个操作符
+Arithmetic定义了四则运算限制，即所限制的类型必须有`+`、`-`、`*`、`/`四个操作符
 
 ### 使用concepts定义Arithmatic
 
 ```cpp
 template <typename T>
-concept bool Arithmatic = 
+concept bool Arithmetic = 
         requires (T t) {            // 参数化限制
             {t + t} -> T,       // 表达式限制， 隐式转化限制
             {t - t} -> T,
@@ -36,14 +36,14 @@ concept bool Arithmatic =
 它可以这样来使用：
 
 ```cpp
-Arithmatic{T}
+Arithmetic{T}
 void f(T t)
 {
-    std::cout << typeid(T).name() << " is Arithmatic." << std::endl;
+    std::cout << typeid(T).name() << " is Arithmetic." << std::endl;
 }
 ```
 
-### 使用模板元变成定义Arithmatic
+### 使用模板元编程定义Arithmetic
 
 ```cpp
 // void_t只接收构造参数，并不产生任何类型
@@ -52,11 +52,11 @@ using void_t = void;
 
 // 匹配失败
 template <typename T, typename = void>
-struct _Arithmatic : std::false_type { };
+struct _Arithmetic : std::false_type { };
 
 
 template <typename T>
-struct _Arithmatic<T, void_t<
+struct _Arithmetic<T, void_t<
     decltype(static_cast<T>(static_cast<T>(*(T*)0) + static_cast<T>(*(T*)0))),
     decltype(static_cast<T>(static_cast<T>(*(T*)0) - static_cast<T>(*(T*)0))),
     decltype(static_cast<T>(static_cast<T>(*(T*)0) * static_cast<T>(*(T*)0))),
@@ -65,13 +65,13 @@ struct _Arithmatic<T, void_t<
 
 // 封装以方便使用
 template <typename T>
-using Arithmatic = typename std::enable_if<_Arithmatic<T>::value>::type;
+using Arithmetic = typename std::enable_if<_Arithmetic<T>::value>::type;
 ```
 
 我们通过关联类型来使用它：
 
 ```cpp
-template <typename T, typename = Arithmatic<T>>
+template <typename T, typename = Arithmetic<T>>
 void f(T p)
 {
     std::cout << typeid(T).name() <<  " is Arithmatic" << std::endl;
