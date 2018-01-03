@@ -37,18 +37,22 @@ instance BasicEq Bool where
 ```cpp
 // concept
 template <typename X>
-concept bool Hashset = HasEmpty<X> && requires () {
+concept bool Hashset = HasEmpty<X> && requires (X x) {
     typename X::element;
-    requires Hashable<element>;
-    { X.size() } -> int;
-}
+    requires Hashable<X::element>;
+    { x.size() } -> int;
+};
 
 // modelling
+template <typename K>
+struct intmap;
+
+// partial specialization
 template<Hashable K>
 struct intmap<list<K>> {
     typedef K element;
     int size(intmap<list<K>> m) { ... }
-}
+};
 
 // algorithm
 bool almostFull(HashSet h) { ... }
