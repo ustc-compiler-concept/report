@@ -30,7 +30,7 @@ concept bool Arithmetic =
             {t - t} -> T,
             {t * t} -> T,
             {t / t} -> T
-        }
+        };
 ```
 
 它可以这样来使用：
